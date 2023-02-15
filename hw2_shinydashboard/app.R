@@ -12,6 +12,8 @@ library(shinythemes)
 # 4. Use 1st tab to provide info and include images
 # 5. Learn more about reactivity 
 # 6. Learn from slides, cheatsheet, and other resources online 
+# 7. Choose better indicators that can be more informative
+# 
 
 # Load and clean data ----------------------------------------------
 
