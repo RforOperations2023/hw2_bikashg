@@ -22,6 +22,11 @@ library(flexdashboard)
 # what's up?? hope it works.
 ```
 
+---
+title: "Column Orientation"
+output: flexdashboard::flex_dashboard
+---
+
 Column {data-width=650 .tabset}
 -----------------------------------------------------------------------
 

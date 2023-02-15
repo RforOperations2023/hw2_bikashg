@@ -1,0 +1,106 @@
+---
+title: "Data Analysis Portion"
+author: "Bikash Gupta"
+date: "2023-02-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+
+library(shiny)
+library(dplyr)
+library(tidyverse)
+library(tidyr)
+
+country_profile = read.csv('kiva_country_profile_variables.csv')
+
+selected_country = country_profile %>% select(country, Region,
+                          Surface.area..km2.,
+                          Population.in.thousands..2017.,
+                          Population.density..per.km2..2017.,
+                          Population.growth.rate..average.annual...,
+                          Sex.ratio..m.per.100.f..2017.,
+                          GDP.per.capita..current.US..,
+                          Labour.force.participation..female.male.pop....,
+                          Unemployment....of.labour.force.,
+                          Food.production.index..2004.2006.100.,
+                          International.trade..Balance..million.US..,
+                          Urban.population....of.total.population.,
+                          Population.growth.rate..average.annual...,
+                          Fertility.rate..total..live.births.per.woman.,
+                          Life.expectancy.at.birth..females.males..years.,
+                          Infant.mortality.rate..per.1000.live.births,
+                          Health..Total.expenditure....of.GDP.,
+                          Health..Physicians..per.1000.pop..,
+                          Education..Government.expenditure....of.GDP.,
+                          Education..Tertiary.gross.enrol..ratio..f.m.per.100.pop..,
+                          Seats.held.by.women.in.national.parliaments..,
+                          Mobile.cellular.subscriptions..per.100.inhabitants.,
+                          Individuals.using.the.Internet..per.100.inhabitants.,
+                          Forested.area....of.land.area.,
+                          Energy.supply.per.capita..Gigajoules.)
+
+selected_country <- selected_country %>% 
+  separate(Labour.force.participation..female.male.pop...., 
+           c("Female Labor Paricipation", "Male Labor Participation"),"/")
+  
+
+```
+
+```{r}
+#head(selected_country,10)
+glimpse(selected_country)
+
+
+```
+
+```{r}
+
+selected_country$`Education..Government.expenditure....of.GDP.`
+
+```
+
+```{r}
+# convert certain columns into numeric 
+
+selected_country$`Education..Government.expenditure....of.GDP.` = 
+  as.numeric(selected_country$`Education..Government.expenditure....of.GDP.`)
+
+selected_country$`Education..Government.expenditure....of.GDP.`
+
+```
+
+```{r}
+
+selected_country <- selected_country %>% 
+  mutate_at(c('Population.growth.rate..average.annual...', 
+              'Female Labor Paricipation',
+              'Male Labor Participation',
+              'Unemployment....of.labour.force.',
+              'Health..Physicians..per.1000.pop..',
+              'Education..Government.expenditure....of.GDP.',
+              'Mobile.cellular.subscriptions..per.100.inhabitants.'), as.numeric)
+
+
+``` 
+
+```{r}
+
+selected_country[selected_country==-99|selected_country=='-99'] <- NA 
+
+
+```
+
+```{r}
+#head(selected_country, 20) 
+glimpse(selected_country)
+```
+
+```{r}
+write.csv(selected_country, 'selected_country.csv')
+
+``` 
