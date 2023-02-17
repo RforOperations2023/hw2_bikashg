@@ -5,6 +5,16 @@ library(dplyr)
 library(plotly)
 library(shinythemes)
 
+# Next steps:
+# 1. go through https://rstudio.github.io/shinydashboard/structure.html#message-menus
+# 2. go through shiny cheatsheet
+# 3. look at the data: see what reasonable attributes I can choose
+# 4. change attributes to numerical, where possible
+# 5. Clean the attributes name --> tidier name
+# 6. Beautify the project --> make sure requirements is felt
+# 7. Add features. Learn more
+
+
 # Questions
 # 1. how to make sure info boxes change as I make changes to slider?
 # 2. the goal of reactive function visually 
