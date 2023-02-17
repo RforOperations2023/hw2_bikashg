@@ -5,6 +5,12 @@ library(dplyr)
 library(plotly)
 library(shinythemes)
 
+# Questions
+# 1. how to make sure info boxes change as I make changes to slider?
+# 2. the goal of reactive function visually 
+# 3. hw2 requirements: last time, I was attempting scatterplot, and I ran into
+# error; so I had to abandon it. I want to understand the requirements well
+
 # Next steps:
 # 1. Appropriate Ids: output and input
 # 2. Figure out why info box do not buzz 
@@ -17,6 +23,10 @@ library(shinythemes)
 
 # Load and clean data ----------------------------------------------
 
+# Two options: 
+# dont change as factors
+# or don't use the melted version 
+
 country_profile <- read.csv('selected_country.csv')
 
 country_profile <- country_profile %>%
@@ -28,7 +38,7 @@ pdf(NULL)
 
 
 # Application header & title ----------------------------------------------
-header <- dashboardHeader(title = "Country Profile Dashboard",
+header <- dashboardHeader(title = "Country Profile Dashboard", titleWidth = 350,
 
                           # Drop down menu with hard coded values ------------------------------
                           dropdownMenu(type = "notifications",
@@ -48,7 +58,7 @@ header <- dashboardHeader(title = "Country Profile Dashboard",
 )
 
 # Dashboard Sidebar ----------------------------------------------
-sidebar <- dashboardSidebar(
+sidebar <- dashboardSidebar(width=350,
   sidebarMenu(
     id = "tabs",
     
@@ -71,7 +81,18 @@ sidebar <- dashboardSidebar(
                 max = max(country_profile$GDP.per.capita..current.US.., na.rm = T),
                 value = c(min(country_profile$GDP.per.capita..current.US.., na.rm = T), 
                           max(country_profile$GDP.per.capita..current.US.., na.rm = T)),
-                step = 100)
+                step = 100),
+    
+    selectInput("x_var", "Select X Variable", 
+                choices = c("Health..Total.expenditure....of.GDP.", 
+                            "Education..Government.expenditure....of.GDP.", 
+                            "Individuals.using.the.Internet..per.100.inhabitants.")),
+    
+    
+    selectInput("y_var", "Select Y Variable", 
+                choices = c("Infant.mortality.rate..per.1000.live.births",
+                            "GDP.per.capita..current.US.."))
+    
   )
 )
 
@@ -85,7 +106,8 @@ body <- dashboardBody(tabItems(
           # Input and Value Boxes ----------------------------------------------
           fluidRow(
             infoBoxOutput("mass"),
-            valueBoxOutput("height")
+            valueBoxOutput("height"),
+            valueBoxOutput('newitem')
           ),
           
           # Plot ----------------------------------------------
@@ -93,7 +115,9 @@ body <- dashboardBody(tabItems(
             tabBox(title = "Plot",
                    width = 12,
                    tabPanel("Food Production", plotlyOutput("plot_mass")),
-                   tabPanel("Women Leaders", plotlyOutput("plot_height")))
+                   tabPanel("Women Leaders", plotlyOutput("plot_height")),
+                   tabPanel("Scatterplot", plotlyOutput("scatterplot")),
+                   tabPanel("Pie Chart", plotlyOutput("piechart")))
           )
   ),
   
@@ -115,7 +139,8 @@ server <- function(input, output) {
     country_sub <- country_profile %>%
       
     # GDP Per Capita Filter ----------------------------------------------
-    filter(GDP.per.capita..current.US.. >= input$birthSelect[1] & GDP.per.capita..current.US.. <= input$birthSelect[2])
+    filter(`GDP.per.capita..current.US..` >= input$birthSelect[1],
+           `GDP.per.capita..current.US..` <= input$birthSelect[2])
     
     # Region Filter ----------------------------------------------
     if (length(input$worldSelect) > 0 ) {
@@ -150,6 +175,28 @@ server <- function(input, output) {
       theme(axis.text.x=element_text(angle=45,hjust=1,vjust=0.5))
   })
   
+  
+  # a plot showing the scatterplot
+  output$scatterplot <- renderPlotly({
+    print(summary(swInput()[input$x_var]))
+    print(summary(swInput()[input$y_var]))
+    ggplot(swInput(), aes_string(x = input$x_var, y = input$y_var)) +
+   #ggplot(swInput(), aes(x = !!sym(input$x_var), y = !!sym(input$y_var))) +
+    geom_point()
+  })
+  
+  # Create reactive pie chart based on input values
+  output$piechart <- renderPlotly({
+    pie_data <- swInput() %>%
+      group_by(Region) %>%
+      summarise(n = n(), avg_area = mean(`Surface.area..km2.`, na.rm=TRUE))
+    
+    plot_ly(pie_data, labels = ~Region, values = ~avg_area, type = "pie")
+    
+    # raw numbers
+  })
+  
+  
   # Data table of characters ----------------------------------------------
   output$table <- DT::renderDataTable({
     subset(swInput(), select = c(country, Region, Population.density..per.km2..2017.))
@@ -172,6 +219,15 @@ server <- function(input, output) {
     
     valueBox(subtitle = "Women Leaders Number", value = num, icon = icon("sort-numeric-asc"), color = "green")
   })
+  
+  output$newitem <- renderValueBox({
+    sw <- swInput()
+    num <- round(mean(sw$Health..Total.expenditure....of.GDP., na.rm = T), 2)
+    
+    valueBox(subtitle = "Health Expenditure", value = num, 
+             icon = icon("sort-numeric-asc"), color = "blue")
+  })
+  
 }
 
 # Run the application ----------------------------------------------
