@@ -60,6 +60,14 @@ glimpse(selected_country)
 
 ```{r}
 
+selected_country <- selected_country %>% 
+  separate(Energy.supply.per.capita..Gigajoules., 
+           c("Energy supply per capita", "Irrelevant"),"/")
+
+```
+
+```{r}
+
 selected_country$`Education..Government.expenditure....of.GDP.`
 
 ```
@@ -71,6 +79,8 @@ selected_country$`Education..Government.expenditure....of.GDP.` =
   as.numeric(selected_country$`Education..Government.expenditure....of.GDP.`)
 
 selected_country$`Education..Government.expenditure....of.GDP.`
+glimpse(selected_country)
+selected_country$`Energy supply per capita`
 
 ```
 
@@ -83,7 +93,8 @@ selected_country <- selected_country %>%
               'Unemployment....of.labour.force.',
               'Health..Physicians..per.1000.pop..',
               'Education..Government.expenditure....of.GDP.',
-              'Mobile.cellular.subscriptions..per.100.inhabitants.'), as.numeric)
+              'Mobile.cellular.subscriptions..per.100.inhabitants.',
+              'Energy supply per capita'), as.numeric)
 
 
 ``` 
